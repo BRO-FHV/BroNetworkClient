@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TCPEchoClient", "TCPEchoCli
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UDPEchoClient", "UDPEchoClient\UDPEchoClient.csproj", "{191B60DB-7A75-4136-B23D-F90F4F2DACF6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LEDController", "LEDController\LEDController.csproj", "{462369C0-46B9-48B8-BD34-59CD17377830}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LEDController", "LEDController\LEDController.csproj", "{57949B93-FBD5-45BD-986F-5E92B42F2ADF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +23,10 @@ Global
 		{191B60DB-7A75-4136-B23D-F90F4F2DACF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{191B60DB-7A75-4136-B23D-F90F4F2DACF6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{191B60DB-7A75-4136-B23D-F90F4F2DACF6}.Release|Any CPU.Build.0 = Release|Any CPU
-		{462369C0-46B9-48B8-BD34-59CD17377830}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{462369C0-46B9-48B8-BD34-59CD17377830}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{462369C0-46B9-48B8-BD34-59CD17377830}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{462369C0-46B9-48B8-BD34-59CD17377830}.Release|Any CPU.Build.0 = Release|Any CPU
+		{57949B93-FBD5-45BD-986F-5E92B42F2ADF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{57949B93-FBD5-45BD-986F-5E92B42F2ADF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{57949B93-FBD5-45BD-986F-5E92B42F2ADF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{57949B93-FBD5-45BD-986F-5E92B42F2ADF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
