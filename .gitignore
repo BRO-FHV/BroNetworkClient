@@ -1,21 +1,33 @@
-# Compiled Object files
-*.slo
-*.lo
-*.o
+#ignore thumbnails created by windows
+Thumbs.db
+#Ignore files build by Visual Studio
 *.obj
-
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
 *.exe
-*.out
-*.app
+*.pdb
+*.user
+*.aps
+*.pch
+*.vspscc
+*_i.c
+*_p.c
+*.ncb
+*.suo
+*.tlb
+*.tlh
+*.bak
+*.cache
+*.ilk
+*.dll
+*.log
+[Bin]
+[Debug]
+*.lib
+*.sbr
+obj/
+[Release]
+*.dll
+*.pdb
+*.doc
+*docx
+*.pdf
+*.vsdx
