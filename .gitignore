@@ -19,12 +19,11 @@ Thumbs.db
 *.ilk
 *.dll
 *.log
-[Bin]
-[Debug]
+bin/
+Debug/
 *.lib
 *.sbr
 obj/
-[Release]
 *.dll
 *.pdb
 *.doc
