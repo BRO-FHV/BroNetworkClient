@@ -21,7 +21,17 @@ namespace BroUDPChat.Command
             return string.IsNullOrEmpty(vm.UserName);
         }
 
-        public event EventHandler CanExecuteChanged;
+        public event EventHandler CanExecuteChanged
+        {
+            add
+            {
+                CommandManager.RequerySuggested += value;
+            }
+            remove
+            {
+                CommandManager.RequerySuggested -= value;
+            }
+        }
 
         public void Execute(object parameter)
         {

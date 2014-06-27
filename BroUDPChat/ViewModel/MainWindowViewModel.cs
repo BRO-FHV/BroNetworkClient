@@ -14,7 +14,7 @@ namespace BroUDPChat
 {
     public class MainWindowViewModel : INotifyPropertyChanged, ISendMessageCmdVm, ISetUserNameCmdVm, ISetLEDVM
     {
-        private string _userName= "     ";
+        private string _userName= "";
         private string _text;
         private bool _led1;
         private bool _led2;
@@ -49,7 +49,11 @@ namespace BroUDPChat
         public string UserName
         {
             get { return _userName; }
-            set { _userName = value; NotifyPorpertyChanged(); }
+            set {
+                _userName = value; 
+                NotifyPorpertyChanged(); 
+                NotifyPorpertyChanged("UserNameNotNull");
+            }
         }
 
         public string History
@@ -83,6 +87,8 @@ namespace BroUDPChat
             set { _led4 = value; NotifyPorpertyChanged(); }
         }
 
+        public bool UserNameNotNull { get { return !string.IsNullOrEmpty(UserName);} }
+
         public SendMessageCmd CommandSendMessage { get; set; }
 
         public SetUserNameCmd CommandSetUserName { get; set; }
@@ -102,6 +108,7 @@ namespace BroUDPChat
                 PropertyChanged(this, new PropertyChangedEventArgs(name));
             }
         }
+        
 
         public void SendMessage()
         {
