@@ -14,7 +14,7 @@ namespace BroUDPChat
 {
     public class MainWindowViewModel : INotifyPropertyChanged, ISendMessageCmdVm, ISetUserNameCmdVm, ISetLEDVM
     {
-        private string _userName;
+        private string _userName= "     ";
         private string _text;
         private bool _led1;
         private bool _led2;
@@ -25,7 +25,7 @@ namespace BroUDPChat
         private static IPAddress IP_ADDRESS = IPAddress.Parse("192.168.0.7");
         private static int PORT = 2000;
         private static IPEndPoint END_POINT = new IPEndPoint(IP_ADDRESS, PORT);
-
+        private static byte LED = 0x01;
         public MainWindowViewModel()
         {
             CommandSendMessage = new SendMessageCmd(this);
@@ -105,38 +105,56 @@ namespace BroUDPChat
 
         public void SendMessage()
         {
-            using (Socket sock = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp))
-            {
-                byte[] send_buffer = Encoding.ASCII.GetBytes(TextToSend);
-                sock.SendTo(send_buffer, END_POINT);
-            }
+            if (!string.IsNullOrWhiteSpace(TextToSend))
+                Send(TextToSend);
         }
 
         public void SetUserName()
         {
+            UserName = UserName;
+        }
+
+        private void Send(string text)
+        {
             using (Socket sock = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp))
             {
-                byte[] send_buffer = Encoding.ASCII.GetBytes("UserName=" + UserName);
+                byte[] send_buffer = Encoding.ASCII.GetBytes(UserName + ": " + text);
                 sock.SendTo(send_buffer, END_POINT);
+            }
+        }
+
+        private void Send(byte[] data)
+        {
+            using (Socket sock = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp))
+            {
+                byte[] username = Encoding.ASCII.GetBytes(UserName + ": ");
+                byte[] buffer = new byte[7+data.Length] ;
+                for (int i = 0; i < username.Length; i++)
+                {
+                    buffer[i]= username[i];
+                }
+                for (int i = 0; i < data.Length; i++)
+                {
+                    buffer[i + 7] = data[i];
+                }
+                sock.SendTo(buffer, END_POINT);
             }
         }
 
         public void EnableLED(int num)
         {
-            using (Socket sock = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp))
-            {
-                byte[] send_buffer = Encoding.ASCII.GetBytes("EnableLED=" + num);
-                sock.SendTo(send_buffer, END_POINT);
-            }
+            byte status = 1;
+            byte LEDnum = (byte)num;
+            byte[] data = new byte[] { LED, LEDnum, status };
+            Send(data);
         }
 
         public void DisableLED(int num)
         {
-            using (Socket sock = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp))
-            {
-                byte[] send_buffer = Encoding.ASCII.GetBytes("DisableLED=" + num);
-                sock.SendTo(send_buffer, END_POINT);
-            }
+            byte status = 0;
+            byte LEDnum = (byte)num;
+            byte[] data = new byte[] { LED, LEDnum, status };
+            Send(data);
         }
 
         private void CreateUdpReadThread()
