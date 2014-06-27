@@ -15,7 +15,7 @@ namespace BroUDPChat
     public class MainWindowViewModel : INotifyPropertyChanged, ISendMessageCmdVm, ISetUserNameCmdVm, ISetLEDVM
     {
         private string _userName= "";
-        private string _text;
+        private StringBuilder _text;
         private bool _led1;
         private bool _led2;
         private bool _led3;
@@ -26,8 +26,13 @@ namespace BroUDPChat
         private static int PORT = 2000;
         private static IPEndPoint END_POINT = new IPEndPoint(IP_ADDRESS, PORT);
         private static byte LED = 0x01;
+        private static int USERNAME_LENGTH = 7;
+        private static int COMMAND_LENTGH = 1;
+
         public MainWindowViewModel()
         {
+            _text = new StringBuilder();
+
             CommandSendMessage = new SendMessageCmd(this);
             CommandSetUserName = new SetUserNameCmd(this);
             CommandLED1 = new SetLEDCommand(this, 1);
@@ -58,8 +63,8 @@ namespace BroUDPChat
 
         public string History
         {
-            get { return _text; }
-            set { _text += value; NotifyPorpertyChanged(); }
+            get { return _text.ToString(); }
+            set { _text.AppendLine(value); NotifyPorpertyChanged(); }
         }
 
         public bool Led1
@@ -135,14 +140,14 @@ namespace BroUDPChat
             using (Socket sock = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp))
             {
                 byte[] username = Encoding.ASCII.GetBytes(UserName + ": ");
-                byte[] buffer = new byte[7+data.Length] ;
+                byte[] buffer = new byte[USERNAME_LENGTH + data.Length];
                 for (int i = 0; i < username.Length; i++)
                 {
                     buffer[i]= username[i];
                 }
                 for (int i = 0; i < data.Length; i++)
                 {
-                    buffer[i + 7] = data[i];
+                    buffer[i + USERNAME_LENGTH] = data[i];
                 }
                 sock.SendTo(buffer, END_POINT);
             }
@@ -175,42 +180,27 @@ namespace BroUDPChat
                 while (true)
                 {
                     var received = await server.Receive();
-                    propcessText(received.Message);
-
-                    Console.WriteLine("received: " + received.Message);
+                    propcessText(received);
                 }
             });
         }
 
-        private void propcessText(string p)
+        private void propcessText(Received rec)
         {
-            if (p.StartsWith("SetLED="))
+            StringBuilder sb = new StringBuilder();
+
+            sb.Append(rec.Username);
+
+            if (rec.Command == 1 && rec.Parameter.Length == 2)
             {
-                string LED = p.Split('=')[1];
-                int LEDNum = int.Parse(LED.Split(':')[0]);
-                bool on = bool.Parse(LED.Split(':')[1]);
-                switch (LEDNum)
-                {
-                    case 1:
-                        Led1 = on;
-                        break;
-                    case 2:
-                        Led2 = on;
-                        break;
-                    case 3:
-                        Led3 = on;
-                        break;
-                    case 4:
-                        Led4 = on;
-                        break;
-                    default:
-                        break;
-                }
+                sb.AppendFormat("LED {0} {1}", rec.Parameter[1], rec.Parameter[0]);
             }
             else
             {
-                History = p + "\n";
+                sb.Append("unknown command");
             }
+
+            History = sb.ToString();
         }
 
         public class DataEventArgs : EventArgs
@@ -228,7 +218,9 @@ namespace BroUDPChat
         public struct Received
         {
             public IPEndPoint Sender;
-            public string Message;
+            public string Username;
+            public byte Command;
+            public byte[] Parameter;
         }
 
         abstract class UdpBase
@@ -243,11 +235,24 @@ namespace BroUDPChat
             public async Task<Received> Receive()
             {
                 var result = await Client.ReceiveAsync();
-                return new Received()
+                Received rec = new Received()
                 {
-                    Message = Encoding.ASCII.GetString(result.Buffer, 0, result.Buffer.Length),
+                    Username = Encoding.UTF8.GetString(result.Buffer, 0, USERNAME_LENGTH),
+                    Command = result.Buffer[USERNAME_LENGTH],
                     Sender = result.RemoteEndPoint
                 };
+
+                rec.Parameter = new byte[result.Buffer.Length - USERNAME_LENGTH - COMMAND_LENTGH];
+                int lastIndex = USERNAME_LENGTH + COMMAND_LENTGH;
+
+                for (int i = result.Buffer.Length - 1, j = 0; i >= lastIndex; i--, j++)
+                {
+                    rec.Parameter[j] = result.Buffer[i];
+                }
+
+                rec.Username = rec.Username.Replace("\0", string.Empty);
+
+                return rec;
             }
         }
 

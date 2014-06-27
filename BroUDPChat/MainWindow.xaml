@@ -56,7 +56,9 @@
                 <Label Grid.ColumnSpan="4" Content="Messages" Background="LightBlue" Grid.Row="2"/>
 
                 <Border Margin="0, 5, 5, 0" Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="3" BorderBrush="Black" BorderThickness="1">
-                    <TextBlock TextWrapping="Wrap" Text="{Binding History}"  Foreground="DarkGreen"/>
+                    <ScrollViewer>
+                        <TextBlock TextWrapping="Wrap" Text="{Binding History}"  Foreground="DarkGreen"/>
+                    </ScrollViewer>
                 </Border>
 
                 <Separator Grid.Row="4" Grid.ColumnSpan="3"/>
