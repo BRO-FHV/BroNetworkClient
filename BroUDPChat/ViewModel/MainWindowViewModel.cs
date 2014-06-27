@@ -22,10 +22,9 @@ namespace BroUDPChat
         private bool _led4;
         private string _textToSend;
 
-        private static const IPAddress IP_ADDRESS = IPAddress.Parse("192.168.0.7");
-
-        private static const IPEndPoint endPoint = new IPEndPoint(IP_ADDRESS, 2000);
-
+        private static IPAddress IP_ADDRESS = IPAddress.Parse("192.168.0.7");
+        private static int PORT = 2000;
+        private static IPEndPoint END_POINT = new IPEndPoint(IP_ADDRESS, PORT);
 
         public MainWindowViewModel()
         {
@@ -36,7 +35,7 @@ namespace BroUDPChat
             CommandLED3 = new SetLEDCommand(this, 3);
             CommandLED4 = new SetLEDCommand(this, 4);
 
-
+            CreateUdpReadThread();
         }
 
 
@@ -109,7 +108,7 @@ namespace BroUDPChat
             using (Socket sock = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp))
             {
                 byte[] send_buffer = Encoding.ASCII.GetBytes(TextToSend);
-                sock.SendTo(send_buffer, endPoint);
+                sock.SendTo(send_buffer, END_POINT);
             }
         }
 
@@ -118,7 +117,7 @@ namespace BroUDPChat
             using (Socket sock = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp))
             {
                 byte[] send_buffer = Encoding.ASCII.GetBytes("UserName=" + UserName);
-                sock.SendTo(send_buffer, endPoint);
+                sock.SendTo(send_buffer, END_POINT);
             }
         }
 
@@ -127,7 +126,7 @@ namespace BroUDPChat
             using (Socket sock = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp))
             {
                 byte[] send_buffer = Encoding.ASCII.GetBytes("EnableLED=" + num);
-                sock.SendTo(send_buffer, endPoint);
+                sock.SendTo(send_buffer, END_POINT);
             }
         }
 
@@ -136,71 +135,26 @@ namespace BroUDPChat
             using (Socket sock = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp))
             {
                 byte[] send_buffer = Encoding.ASCII.GetBytes("DisableLED=" + num);
-                sock.SendTo(send_buffer, endPoint);
+                sock.SendTo(send_buffer, END_POINT);
             }
         }
-
-
-        private Thread _udpReadThread;
-        private volatile bool _terminateThread;
-
-        public event DataEventHandler OnDataReceived;
-        public delegate void DataEventHandler(object sender, DataEventArgs e);
 
         private void CreateUdpReadThread()
         {
-            _udpReadThread = new Thread(UdpReadThread) { Name = "UDP Read thread" };
-            _udpReadThread.Start(endPoint);
-        }
+            //create a new server
+            var server = new UdpListener();
 
-        private void UdpReadThread(object endPoint)
-        {
-            var myEndPoint = (EndPoint)endPoint;
-            var udpListener = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-            udpListener.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, true);
-
-            // Important to specify a timeout value, otherwise the socket ReceiveFrom() 
-            // will block indefinitely if no packets are received and the thread will never terminate
-            udpListener.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveTimeout, 100);
-            udpListener.Bind(myEndPoint);
-
-            try
+            //start listening for messages and copy the messages back to the client
+            Task.Factory.StartNew(async () =>
             {
-                while (!_terminateThread)
+                while (true)
                 {
-                    try
-                    {
-                        var buffer = new byte[1024];
-                        var size = udpListener.ReceiveFrom(buffer, ref myEndPoint);
-                        Array.Resize(ref buffer, size);
+                    var received = await server.Receive();
+                    propcessText(received.Message);
 
-                        // Let any consumer(s) handle the data via an event
-                        FireOnDataReceived(((IPEndPoint)(myEndPoint)).Address, buffer);
-                    }
-                    catch (SocketException socketException)
-                    {
-                        // Handle socket errors
-                    }
+                    Console.WriteLine("received: " + received.Message);
                 }
-            }
-            finally
-            {
-                // Close Socket
-                udpListener.Shutdown(SocketShutdown.Both);
-                udpListener.Close();
-            }
-        }
-
-        public void FireOnDataReceived(IPAddress address, byte[] buffer)
-        {
-            if (address == IP_ADDRESS)
-            {
-                propcessText(Encoding.ASCII.GetString(buffer));
-            }
-            if (OnDataReceived != null)
-            {
-                OnDataReceived(this, new DataEventArgs(address, buffer));
-            }
+            });
         }
 
         private void propcessText(string p)
@@ -244,6 +198,76 @@ namespace BroUDPChat
                 IpAddress = ipaddress;
                 Data = data;
             }
+        }
+
+        public struct Received
+        {
+            public IPEndPoint Sender;
+            public string Message;
+        }
+
+        abstract class UdpBase
+        {
+            protected UdpClient Client;
+
+            protected UdpBase()
+            {
+                Client = new UdpClient();
+            }
+
+            public async Task<Received> Receive()
+            {
+                var result = await Client.ReceiveAsync();
+                return new Received()
+                {
+                    Message = Encoding.ASCII.GetString(result.Buffer, 0, result.Buffer.Length),
+                    Sender = result.RemoteEndPoint
+                };
+            }
+        }
+
+        //Server
+        class UdpListener : UdpBase
+        {
+            private IPEndPoint _listenOn;
+
+            public UdpListener()
+                : this(new IPEndPoint(IPAddress.Any, PORT))
+            {
+            }
+
+            public UdpListener(IPEndPoint endpoint)
+            {
+                _listenOn = endpoint;
+                Client = new UdpClient(_listenOn);
+            }
+
+            public void Reply(string message, IPEndPoint endpoint)
+            {
+                var datagram = Encoding.ASCII.GetBytes(message);
+                Client.Send(datagram, datagram.Length, endpoint);
+            }
+
+        }
+
+        //Client
+        class UdpUser : UdpBase
+        {
+            private UdpUser() { }
+
+            public static UdpUser ConnectTo(string hostname, int port)
+            {
+                var connection = new UdpUser();
+                connection.Client.Connect(hostname, port);
+                return connection;
+            }
+
+            public void Send(string message)
+            {
+                var datagram = Encoding.ASCII.GetBytes(message);
+                Client.Send(datagram, datagram.Length);
+            }
+
         }
     }
 }

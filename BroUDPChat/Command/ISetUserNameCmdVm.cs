@@ -8,7 +8,7 @@ namespace BroUDPChat.Command
 {
     public interface ISetUserNameCmdVm
     {
-        public string UserName;
+        string UserName { get; }
         void SetUserName();
     }
 }

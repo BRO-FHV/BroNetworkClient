@@ -8,7 +8,7 @@ namespace BroUDPChat.Command
 {
     public interface ISendMessageCmdVm
     {
-        public string UserName;
-        public void SendMessage();
+        string UserName { get; }
+        void SendMessage();
     }
 }

@@ -22,9 +22,9 @@
                 </Grid.ColumnDefinitions>
                 <Label Grid.ColumnSpan="4" Content="Control LEDs"/>
                 <CheckBox Grid.Row="2" x:Name="LED1" Content="LED 1" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Center" IsChecked="{Binding Led1}" Command="{Binding Path=CommandLED1}" CommandParameter="{Binding Path=IsChecked, RelativeSource={RelativeSource Self}}"/>
-                <CheckBox Grid.Row="2" x:Name="LED2" Content="LED 2" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" IsChecked="{Binding Led1}" Command="{Binding Path=CommandLED2}" CommandParameter="{Binding Path=IsChecked, RelativeSource={RelativeSource Self}}"/>
-                <CheckBox Grid.Row="2" x:Name="LED3" Content="LED 3" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center" IsChecked="{Binding Led1}" Command="{Binding Path=CommandLED3}" CommandParameter="{Binding Path=IsChecked, RelativeSource={RelativeSource Self}}"/>
-                <CheckBox Grid.Row="2" x:Name="LED4" Content="LED 4" Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Center" IsChecked="{Binding Led1}" Command="{Binding Path=CommandLED4}" CommandParameter="{Binding Path=IsChecked, RelativeSource={RelativeSource Self}}"/>
+                <CheckBox Grid.Row="2" x:Name="LED2" Content="LED 2" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" IsChecked="{Binding Led2}" Command="{Binding Path=CommandLED2}" CommandParameter="{Binding Path=IsChecked, RelativeSource={RelativeSource Self}}"/>
+                <CheckBox Grid.Row="2" x:Name="LED3" Content="LED 3" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center" IsChecked="{Binding Led3}" Command="{Binding Path=CommandLED3}" CommandParameter="{Binding Path=IsChecked, RelativeSource={RelativeSource Self}}"/>
+                <CheckBox Grid.Row="2" x:Name="LED4" Content="LED 4" Grid.Column="3" HorizontalAlignment="Center" VerticalAlignment="Center" IsChecked="{Binding Led4}" Command="{Binding Path=CommandLED4}" CommandParameter="{Binding Path=IsChecked, RelativeSource={RelativeSource Self}}"/>
             </Grid>
         </Border>
         <Border BorderBrush="Black" BorderThickness="1" Margin="5" Grid.Row="1">

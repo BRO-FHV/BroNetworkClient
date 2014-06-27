@@ -53,6 +53,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Command\ISendMessageCmdVm.cs" />
+    <Compile Include="Command\ISetLEDVM.cs" />
+    <Compile Include="Command\ISetUserNameCmdVm.cs" />
+    <Compile Include="Command\SendMessageCmd.cs" />
+    <Compile Include="Command\SetLEDCommand.cs" />
+    <Compile Include="Command\SetUserNameCmd.cs" />
     <Compile Include="ViewModel\MainWindowViewModel.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

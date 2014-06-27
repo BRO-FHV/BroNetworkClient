@@ -19,7 +19,7 @@ namespace BroUDPChat.Command
 
         public bool CanExecute(object parameter)
         {
-            throw new NotImplementedException();
+            return true;
         }
 
         public event EventHandler CanExecuteChanged;

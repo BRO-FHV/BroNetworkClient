@@ -8,7 +8,7 @@ namespace BroUDPChat.Command
 {
     public interface ISetLEDVM
     {
-        public void EnableLED(int num);
-        public void DisableLED(int num);
+        void EnableLED(int num);
+        void DisableLED(int num);
     }
 }
