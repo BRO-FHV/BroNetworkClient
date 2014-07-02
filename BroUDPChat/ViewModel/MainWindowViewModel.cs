@@ -118,7 +118,7 @@ namespace BroUDPChat
         public void SendMessage()
         {
             if (!string.IsNullOrWhiteSpace(TextToSend))
-                Send(TextToSend);
+                Send(" " + TextToSend);
         }
 
         public void SetUserName()
@@ -189,7 +189,7 @@ namespace BroUDPChat
         {
             StringBuilder sb = new StringBuilder();
 
-            sb.Append(rec.Username);
+            sb.AppendFormat("{0}: {1}", DateTime.UtcNow, rec.Username);
 
             if (rec.Command == 1 && rec.Parameter.Length == 2)
             {
@@ -197,7 +197,7 @@ namespace BroUDPChat
             }
             else
             {
-                sb.Append("unknown command");
+                sb.AppendFormat("Cmd: {0} - Data: {1}", rec.Command, Encoding.ASCII.GetString(rec.Parameter.Reverse().ToArray()));
             }
 
             History = sb.ToString();
