@@ -194,6 +194,23 @@ namespace BroUDPChat
             if (rec.Command == 1 && rec.Parameter.Length == 2)
             {
                 sb.AppendFormat("LED {0} {1}", rec.Parameter[1], rec.Parameter[0]);
+                switch (rec.Parameter[1])
+                {
+                    case 1:
+                        Led1 = rec.Parameter[0] == 1 ? true : false;
+                        break;
+                    case 2:
+                        Led2 = rec.Parameter[0] == 1 ? true : false;
+                        break;
+                    case 3:
+                        Led3 = rec.Parameter[0] == 1 ? true : false;
+                        break;
+                    case 4:
+                        Led4 = rec.Parameter[0] == 1 ? true : false;
+                        break;
+                    default:
+                        break;
+                }
             }
             else
             {
